@@ -13,17 +13,17 @@ Quy ước: chỉ đánh dấu DONE sau khi có kết quả kiểm tra thực t�
 
 ## 1. Tạo repo và nền ứng dụng
 - [x] Tạo repo `Aliuliu001/bang_luong` dạng public; đã xác minh trên GitHub.
-- [ ] Không đưa dữ liệu lương/BHXH cá nhân, workbook nguồn hay backup JSON vào repo public; dữ liệu thật chỉ nhập trong app và backup riêng.
-- [ ] Khởi tạo ứng dụng tĩnh cho GitHub Pages; thiết kế giao diện đơn giản, tiếng Việt.
-- [ ] Tạo cấu trúc dữ liệu có version cho nhân viên, lớp, tháng lương, phép, BHXH, nhắc việc.
-- [ ] Thêm cảnh báo không đưa dữ liệu nhạy cảm vào repo công khai.
+- [x] Không đưa dữ liệu lương/BHXH cá nhân, workbook nguồn hay backup JSON vào repo public; dữ liệu thật chỉ nhập trong app và backup riêng.
+- [x] Khởi tạo ứng dụng tĩnh cho GitHub Pages; thiết kế giao diện đơn giản, tiếng Việt.
+- [x] Tạo cấu trúc dữ liệu có version cho nhân viên, lớp, tháng lương, phép, BHXH, nhắc việc.
+- [x] Thêm cảnh báo không đưa dữ liệu nhạy cảm vào repo công khai.
 
 ## 2. Danh mục và sao lưu
-- [ ] Nhập danh sách nhân viên/lớp đã được anh xác nhận.
-- [ ] Tạo màn hình chỉnh sửa danh mục, mức lương, bậc, loại lớp, đơn giá kèm, mức BHXH.
-- [ ] Tải backup JSON đầy đủ.
-- [ ] Nhập/khôi phục JSON có xem trước, kiểm tra định dạng/phiên bản và sao lưu trước khi thay thế dữ liệu.
-- [ ] Kiểm tra round-trip JSON và khôi phục trên trình duyệt sạch/máy khác.
+- [x] Nhập danh sách nhân viên/lớp đã được anh xác nhận.
+- [x] Tạo màn hình chỉnh sửa danh mục, mức lương, bậc, loại lớp, đơn giá kèm, mức BHXH.
+- [x] Tải backup JSON đầy đủ.
+- [x] Nhập/khôi phục JSON có xem trước, kiểm tra định dạng/phiên bản và sao lưu trước khi thay thế dữ liệu.
+- [x] Kiểm tra round-trip JSON và khôi phục trên trình duyệt sạch/máy khác.
 
 ## 3. Nhập dữ liệu tháng và tính lương
 - [ ] Tạo tháng tính lương, nhập tay khoản phát sinh/KPI/phép dùng.

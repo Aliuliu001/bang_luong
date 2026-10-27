@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tính Lương & Phép - Joy English Center</title>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body x-data="app()" x-init="init()">
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>💰 Tính Lương & Phép - Joy English Center</h1>
+            <div class="header-actions">
+                <button @click="showBackup = true" class="btn-secondary">💾 Sao lưu/Khôi phục</button>
+                <button @click="currentView = 'settings'" class="btn-secondary">⚙️ Cài đặt</button>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav-tabs">
+            <button @click="currentView = 'dashboard'" :class="{'active': currentView === 'dashboard'}">
+                📊 Tổng quan
+            </button>
+            <button @click="currentView = 'employees'" :class="{'active': currentView === 'employees'}">
+                👥 Nhân viên
+            </button>
+            <button @click="currentView = 'classes'" :class="{'active': currentView === 'classes'}">
+                📚 Lớp học
+            </button>
+            <button @click="currentView = 'payroll'" :class="{'active': currentView === 'payroll'}">
+                💵 Bảng lương
+            </button>
+            <button @click="currentView = 'bhxh'" :class="{'active': currentView === 'bhxh'}">
+                🏥 BHXH
+            </button>
+            <button @click="currentView = 'leave'" :class="{'active': currentView === 'leave'}">
+                🌴 Phép
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard View -->
+            <div x-show="currentView === 'dashboard'" class="view">
+                <h2>📊 Tổng quan</h2>
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <div class="card-icon">👥</div>
+                        <div class="card-value" x-text="employees.length"></div>
+                        <div class="card-label">Nhân viên</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">📚</div>
+                        <div class="card-value" x-text="classes.length"></div>
+                        <div class="card-label">Lớp học</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">💵</div>
+                        <div class="card-value" x-text="payrollMonths.length"></div>
+                        <div class="card-label">Kỳ lương đã chốt</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">🏥</div>
+                        <div class="card-value" x-text="bhxhParticipants.length"></div>
+                        <div class="card-label">Người tham gia BHXH</div>
+                    </div>
+                </div>
+
+                <!-- Monthly Reminder -->
+                <div x-show="shouldShowReminder()" class="reminder-box">
+                    <h3>🔔 Nhắc việc cuối tháng</h3>
+                    <div class="checklist">
+                        <template x-for="(item, idx) in monthlyTasks" :key="idx">
+                            <label class="checklist-item">
+                                <input type="checkbox" x-model="item.done">
+                                <span x-text="item.text"></span>
+                                <button @click="copyText(item.text)" class="btn-copy">📋 Sao chép</button>
+                            </label>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Employees View -->
+            <div x-show="currentView === 'employees'" class="view">
+                <div class="view-header">
+                    <h2>👥 Quản lý nhân viên</h2>
+                    <button @click="addEmployee()" class="btn-primary">➕ Thêm nhân viên</button>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Mã NV</th>
+                                <th>Họ và tên</th>
+                                <th>Vị trí</th>
+                                <th>Loại</th>
+                                <th>Bậc</th>
+                                <th>Lương cố định</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="emp in employees" :key="emp.id">
+                                <tr>
+                                    <td x-text="emp.code"></td>
+                                    <td x-text="emp.name"></td>
+                                    <td x-text="emp.position"></td>
+                                    <td x-text="emp.type"></td>
+                                    <td x-text="emp.level || '-'"></td>
+                                    <td x-text="formatMoney(emp.fixedSalary)"></td>
+                                    <td>
+                                        <span :class="'status-' + emp.status" x-text="getStatusText(emp.status)"></span>
+                                    </td>
+                                    <td>
+                                        <button @click="editEmployee(emp)" class="btn-icon">✏️</button>
+                                        <button @click="deleteEmployee(emp.id)" class="btn-icon">🗑️</button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Classes View -->
+            <div x-show="currentView === 'classes'" class="view">
+                <div class="view-header">
+                    <h2>📚 Quản lý lớp học</h2>
+                    <button @click="addClass()" class="btn-primary">➕ Thêm lớp</button>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Mã lớp</th>
+                                <th>Tên lớp</th>
+                                <th>Loại</th>
+                                <th>Giáo viên</th>
+                                <th>Đơn giá (nếu kèm)</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="cls in classes" :key="cls.id">
+                                <tr>
+                                    <td x-text="cls.code"></td>
+                                    <td x-text="cls.name"></td>
+                                    <td>
+                                        <span :class="cls.type === 'Kèm' ? 'badge-special' : 'badge-normal'" x-text="cls.type"></span>
+                                    </td>
+                                    <td x-text="getEmployeeName(cls.teacherId)"></td>
+                                    <td x-text="cls.type === 'Kèm' ? formatMoney(cls.price) : '-'"></td>
+                                    <td>
+                                        <button @click="editClass(cls)" class="btn-icon">✏️</button>
+                                        <button @click="deleteClass(cls.id)" class="btn-icon">🗑️</button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Payroll View -->
+            <div x-show="currentView === 'payroll'" class="view">
+                <div class="view-header">
+                    <h2>💵 Bảng lương</h2>
+                    <button @click="createPayrollMonth()" class="btn-primary">➕ Tạo kỳ lương mới</button>
+                </div>
+
+                <div class="payroll-months">
+                    <template x-for="month in payrollMonths" :key="month.id">
+                        <div class="month-card" @click="openPayrollMonth(month)">
+                            <div class="month-title" x-text="month.name"></div>
+                            <div class="month-stats">
+                                <span>Tổng lương: <strong x-text="formatMoney(month.totalSalary)"></strong></span>
+                                <span>Trạng thái: <span :class="'status-' + month.status" x-text="month.status"></span></span>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- BHXH View -->
+            <div x-show="currentView === 'bhxh'" class="view">
+                <h2>🏥 Quản lý BHXH</h2>
+                
+                <div class="bhxh-summary">
+                    <div class="card">
+                        <div class="card-label">Tổng BHXH nhân viên thường</div>
+                        <div class="card-value" x-text="formatMoney(calculateTotalBHXH('regular'))"></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">BHXH Trương Tuấn Ngọc</div>
+                        <div class="card-value" x-text="formatMoney(settings.bhxhDirector)"></div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Nhân viên</th>
+                                <th>Mức đóng</th>
+                                <th>NLĐ (10.5%)</th>
+                                <th>Công ty (21.5%)</th>
+                                <th>Tổng (32%)</th>
+                                <th>Ghi chú</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="bhxh in bhxhParticipants" :key="bhxh.employeeId">
+                                <tr>
+                                    <td x-text="getEmployeeName(bhxh.employeeId)"></td>
+                                    <td x-text="formatMoney(bhxh.baseSalary)"></td>
+                                    <td x-text="formatMoney(bhxh.employeeContribution)"></td>
+                                    <td x-text="formatMoney(bhxh.companyContribution)"></td>
+                                    <td x-text="formatMoney(bhxh.total)"></td>
+                                    <td x-text="bhxh.note || '-'"></td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="transfer-instructions">
+                    <h3>💳 Lệnh chuyển khoản BHXH</h3>
+                    <div class="transfer-box">
+                        <h4>1. Nhân viên thường (TZ1121Z)</h4>
+                        <div class="transfer-detail">
+                            <label>Số tiền:</label>
+                            <span x-text="formatMoney(calculateTotalBHXH('regular'))"></span>
+                            <button @click="copyText(calculateTotalBHXH('regular'))" class="btn-copy">📋</button>
+                        </div>
+                        <div class="transfer-detail">
+                            <label>Thụ hưởng:</label>
+                            <span>BAO HIEM XA HOI TINH LAM DONG</span>
+                            <button @click="copyText('BAO HIEM XA HOI TINH LAM DONG')" class="btn-copy">📋</button>
+                        </div>
+                        <div class="transfer-detail">
+                            <label>STK:</label>
+                            <span>938015000008</span>
+                            <button @click="copyText('938015000008')" class="btn-copy">📋</button>
+                        </div>
+                        <div class="transfer-detail">
+                            <label>Ngân hàng:</label>
+                            <span>Vietinbank</span>
+                        </div>
+                        <div class="transfer-detail">
+                            <label>Nội dung:</label>
+                            <span x-text="getBHXHContent('regular', currentMonth)"></span>
+                            <button @click="copyText(getBHXHContent('regular', currentMonth))" class="btn-copy">📋</button>
+                        </div>
+                    </div>
+
+                    <div class="transfer-box">
+                        <h4>2. Trương Tuấn Ngọc (Q60460Z)</h4>
+                        <div class="transfer-detail">
+                            <label>Số tiền:</label>
+                            <span x-text="formatMoney(settings.bhxhDirector)"></span>
+                            <button @click="copyText(settings.bhxhDirector)" class="btn-copy">📋</button>
+                        </div>
+                        <div class="transfer-detail">
+                            <label>Thụ hưởng:</label>
+                            <span>BAO HIEM XA HOI TINH LAM DONG</span>
+                            <button @click="copyText('BAO HIEM XA HOI TINH LAM DONG')" class="btn-copy">📋</button>
+                        </div>
+                        <div class="transfer-detail">
+                            <label>STK:</label>
+                            <span>938015000008</span>
+                            <button @click="copyText('938015000008')" class="btn-copy">📋</button>
+                        </div>
+                        <div class="transfer-detail">
+                            <label>Ngân hàng:</label>
+                            <span>Vietinbank</span>
+                        </div>
+                        <div class="transfer-detail">
+                            <label>Nội dung:</label>
+                            <span x-text="getBHXHContent('director', currentMonth)"></span>
+                            <button @click="copyText(getBHXHContent('director', currentMonth))" class="btn-copy">📋</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leave View -->
+            <div x-show="currentView === 'leave'" class="view">
+                <h2>🌴 Quản lý phép</h2>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Nhân viên</th>
+                                <th>Phép đầu kỳ</th>
+                                <th>Phép cộng thêm</th>
+                                <th>Phép đã dùng</th>
+                                <th>Phép còn lại</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="leave in leaveBalances" :key="leave.employeeId">
+                                <tr>
+                                    <td x-text="getEmployeeName(leave.employeeId)"></td>
+                                    <td x-text="leave.initial"></td>
+                                    <td x-text="leave.added"></td>
+                                    <td x-text="leave.used"></td>
+                                    <td><strong x-text="leave.balance"></strong></td>
+                                    <td>
+                                        <button @click="adjustLeave(leave)" class="btn-icon">✏️</button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Settings View -->
+            <div x-show="currentView === 'settings'" class="view">
+                <h2>⚙️ Cài đặt hệ thống</h2>
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <label>BHXH Giám đốc (Trương Tuấn Ngọc):</label>
+                        <input type="number" x-model.number="settings.bhxhDirector" class="input-field">
+                        <small>Hiện tại: <span x-text="formatMoney(settings.bhxhDirector)"></span></small>
+                    </div>
+                    <div class="setting-item">
+                        <label>Tỷ lệ lương cứng (Full-time):</label>
+                        <input type="number" x-model.number="settings.fixedSalaryRatio" class="input-field" min="0" max="100">
+                        <small>% (còn lại là quỹ KPI)</small>
+                    </div>
+                    <div class="setting-item">
+                        <label>Số buổi/tháng (lớp chính):</label>
+                        <input type="number" x-model.number="settings.sessionsPerMonth" class="input-field">
+                    </div>
+                    <div class="setting-item">
+                        <label>Đơn giá lớp kèm mặc định:</label>
+                        <input type="number" x-model.number="settings.defaultKemPrice" class="input-field">
+                    </div>
+                </div>
+                <button @click="saveSettings()" class="btn-primary">💾 Lưu cài đặt</button>
+            </div>
+        </main>
+
+        <!-- Backup Modal -->
+        <div x-show="showBackup" class="modal" @click.self="showBackup = false">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>💾 Sao lưu & Khôi phục</h3>
+                    <button @click="showBackup = false" class="btn-close">✖</button>
+                </div>
+                <div class="modal-body">
+                    <div class="backup-section">
+                        <h4>📥 Tải xuống bản sao lưu</h4>
+                        <p class="warning">⚠️ File backup chứa dữ liệu nhạy cảm (lương, BHXH). Lưu an toàn!</p>
+                        <button @click="downloadBackup()" class="btn-primary">⬇️ Tải xuống JSON</button>
+                    </div>
+                    <div class="backup-section">
+                        <h4>📤 Khôi phục từ file backup</h4>
+                        <p class="warning">⚠️ Thao tác này sẽ thay thế toàn bộ dữ liệu hiện tại!</p>
+                        <input type="file" accept=".json" @change="uploadBackup($event)" class="file-input">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

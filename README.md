@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # bang_luong — hồ sơ dự án
 
 Ứng dụng lương/phép cho Trung tâm Anh văn Joy. Repo: https://github.com/Aliuliu001/bang_luong (public).
@@ -15,3 +16,7 @@ Sau đó đọc `plan.md` (đặc tả đầy đủ) và `task.md` (trạng thá
 
 ## Bảo mật
 Repo công khai chỉ chứa code và tài liệu không nhạy cảm. Không commit dữ liệu lương/BHXH thật, workbook/PDF nguồn, JSON backup hoặc PAT.
+=======
+# joy-payroll-leave
+Ứng dụng tính lương, phép và BHXH cho Trung tâm Anh văn Joy
+>>>>>>> 41584ff7c589c7fe32ac70814f461028421cdaa3

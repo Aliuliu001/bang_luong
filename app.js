@@ -4,6 +4,7 @@ function app() {
         currentView: 'dashboard',
         showBackup: false,
         currentMonth: new Date().toISOString().slice(0, 7), // YYYY-MM
+        selectedPayrollMonth: null,
         
         // Data
         employees: [],
@@ -388,19 +389,91 @@ function app() {
             const newMonth = {
                 id: month,
                 name: `Tháng ${month}`,
-                totalSalary: 0,
-                status: 'Đang tính',
+                status: 'Đang nhập',
                 created: new Date().toISOString(),
-                employees: []
+                payrollData: {},
+                result: null,
+                summary: null
             };
             
             this.payrollMonths.push(newMonth);
             this.saveToLocalStorage();
+            this.selectedPayrollMonth = newMonth;
             alert(`✅ Đã tạo kỳ lương ${month}`);
         },
         
         openPayrollMonth(month) {
-            alert(`🚧 Chức năng chi tiết kỳ lương đang phát triển.\nKỳ: ${month.name}`);
+            this.selectedPayrollMonth = month;
+        },
+        
+        getPayrollInput(employeeId) {
+            if (!this.selectedPayrollMonth) return {};
+            
+            if (!this.selectedPayrollMonth.payrollData[employeeId]) {
+                this.selectedPayrollMonth.payrollData[employeeId] = {
+                    regularClasses: 0,
+                    sessions: 0,
+                    kemSessions: 0,
+                    kpiScore: null,
+                    adjustments: 0,
+                    note: ''
+                };
+            }
+            
+            return this.selectedPayrollMonth.payrollData[employeeId];
+        },
+        
+        calculatePayroll() {
+            if (!this.selectedPayrollMonth) {
+                alert('❌ Chưa chọn kỳ lương!');
+                return;
+            }
+            
+            // Prepare payroll data
+            const payrollData = {};
+            
+            this.employees.forEach(emp => {
+                const input = this.selectedPayrollMonth.payrollData[emp.id] || {};
+                
+                // For Part-time, regularClasses actually means sessions
+                if (emp.type === 'Part-time') {
+                    input.sessions = input.regularClasses || 0;
+                }
+                
+                // Build kem classes array for Full-time teachers
+                if (emp.type === 'Full-time' && emp.position === 'GV') {
+                    const kemSessions = input.kemSessions || 0;
+                    input.kemClasses = kemSessions > 0 ? [{
+                        sessions: kemSessions,
+                        total: kemSessions * this.settings.defaultKemPrice
+                    }] : [];
+                }
+                
+                payrollData[emp.id] = input;
+            });
+            
+            // Calculate using PayrollEngine
+            const result = PayrollEngine.generateMonthPayroll(
+                this.employees,
+                payrollData,
+                this.settings
+            );
+            
+            this.selectedPayrollMonth.result = result;
+            this.selectedPayrollMonth.summary = result.summary;
+            this.selectedPayrollMonth.status = 'Đã tính';
+            
+            this.saveToLocalStorage();
+            alert('✅ Đã tính lương xong!');
+        },
+        
+        exportPayrollExcel() {
+            if (!this.selectedPayrollMonth?.result) {
+                alert('❌ Chưa có kết quả tính lương!');
+                return;
+            }
+            
+            alert('🚧 Chức năng xuất Excel đang phát triển.');
         },
         
         adjustLeave(leave) {

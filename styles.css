@@ -545,3 +545,31 @@ strong {
     font-weight: 700;
     color: #5C4A3A;
 }
+
+/* Payroll specific */
+.payroll-input-section, .payroll-results {
+    margin-top: 30px;
+    padding: 20px;
+    background: #F6F3EE;
+    border-radius: 8px;
+}
+
+.payroll-input-section h4, .payroll-results h4 {
+    color: #5C4A3A;
+    margin-bottom: 16px;
+}
+
+.input-sm {
+    padding: 6px 10px !important;
+    width: 100px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #7A6552;
+}
+
+.empty-state p {
+    font-size: 16px;
+}

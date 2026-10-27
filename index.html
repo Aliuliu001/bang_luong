@@ -8,6 +8,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="payroll-engine.js"></script>
 </head>
 <body x-data="app()" x-init="init()">
     <div class="container">
@@ -176,16 +177,153 @@
                     <button @click="createPayrollMonth()" class="btn-primary">➕ Tạo kỳ lương mới</button>
                 </div>
 
-                <div class="payroll-months">
+                <div class="payroll-months" x-show="!selectedPayrollMonth">
                     <template x-for="month in payrollMonths" :key="month.id">
                         <div class="month-card" @click="openPayrollMonth(month)">
                             <div class="month-title" x-text="month.name"></div>
                             <div class="month-stats">
-                                <span>Tổng lương: <strong x-text="formatMoney(month.totalSalary)"></strong></span>
+                                <span>Tổng lương: <strong x-text="formatMoney(month.summary?.totalNet || 0)"></strong></span>
                                 <span>Trạng thái: <span :class="'status-' + month.status" x-text="month.status"></span></span>
                             </div>
                         </div>
                     </template>
+                    <div x-show="payrollMonths.length === 0" class="empty-state">
+                        <p>Chưa có kỳ lương nào. Nhấn "Tạo kỳ lương mới" để bắt đầu.</p>
+                    </div>
+                </div>
+
+                <!-- Payroll Month Detail -->
+                <div x-show="selectedPayrollMonth" class="payroll-detail">
+                    <div class="view-header">
+                        <div>
+                            <button @click="selectedPayrollMonth = null" class="btn-secondary">← Quay lại</button>
+                            <h3 x-text="selectedPayrollMonth?.name"></h3>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button @click="calculatePayroll()" class="btn-primary">🧮 Tính lương</button>
+                            <button @click="exportPayrollExcel()" class="btn-secondary">📊 Xuất Excel</button>
+                        </div>
+                    </div>
+
+                    <!-- Input Section -->
+                    <div class="payroll-input-section">
+                        <h4>📝 Nhập dữ liệu tháng</h4>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nhân viên</th>
+                                    <th>Vị trí</th>
+                                    <th>Loại</th>
+                                    <th>Số lớp chính / Số buổi</th>
+                                    <th>Số buổi kèm</th>
+                                    <th>KPI (%)</th>
+                                    <th>Điều chỉnh (đ)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template x-for="emp in employees.filter(e => e.status !== 'inactive')" :key="emp.id">
+                                    <tr>
+                                        <td x-text="emp.name"></td>
+                                        <td x-text="emp.position"></td>
+                                        <td x-text="emp.type"></td>
+                                        <td>
+                                            <input 
+                                                x-show="emp.position === 'GV'"
+                                                type="number" 
+                                                x-model.number="getPayrollInput(emp.id).regularClasses"
+                                                class="input-field input-sm"
+                                                :placeholder="emp.type === 'Full-time' ? 'Số lớp' : 'Số buổi'"
+                                            >
+                                            <span x-show="emp.position !== 'GV'">-</span>
+                                        </td>
+                                        <td>
+                                            <input 
+                                                x-show="emp.position === 'GV' && emp.type === 'Full-time'"
+                                                type="number" 
+                                                x-model.number="getPayrollInput(emp.id).kemSessions"
+                                                class="input-field input-sm"
+                                                placeholder="0"
+                                            >
+                                            <span x-show="!(emp.position === 'GV' && emp.type === 'Full-time')">-</span>
+                                        </td>
+                                        <td>
+                                            <input 
+                                                x-show="emp.type === 'Full-time' && emp.position === 'GV'"
+                                                type="number" 
+                                                x-model.number="getPayrollInput(emp.id).kpiScore"
+                                                class="input-field input-sm"
+                                                :placeholder="emp.kpiDefault"
+                                                min="0"
+                                                max="100"
+                                            >
+                                            <span x-show="!(emp.type === 'Full-time' && emp.position === 'GV')">-</span>
+                                        </td>
+                                        <td>
+                                            <input 
+                                                type="number" 
+                                                x-model.number="getPayrollInput(emp.id).adjustments"
+                                                class="input-field input-sm"
+                                                placeholder="0"
+                                            >
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Results Section -->
+                    <div x-show="selectedPayrollMonth?.result" class="payroll-results">
+                        <h4>💰 Kết quả tính lương</h4>
+                        
+                        <!-- Summary Cards -->
+                        <div class="dashboard-grid" style="margin-bottom: 20px;">
+                            <div class="card">
+                                <div class="card-label">Tổng lương gộp</div>
+                                <div class="card-value" x-text="formatMoney(selectedPayrollMonth?.result?.summary.totalGross)"></div>
+                            </div>
+                            <div class="card">
+                                <div class="card-label">BHXH nhân viên</div>
+                                <div class="card-value" x-text="formatMoney(selectedPayrollMonth?.result?.summary.totalBHXHEmployee)"></div>
+                            </div>
+                            <div class="card">
+                                <div class="card-label">BHXH công ty</div>
+                                <div class="card-value" x-text="formatMoney(selectedPayrollMonth?.result?.summary.totalBHXHCompany)"></div>
+                            </div>
+                            <div class="card">
+                                <div class="card-label">Tổng thực nhận</div>
+                                <div class="card-value" x-text="formatMoney(selectedPayrollMonth?.result?.summary.totalNet)"></div>
+                            </div>
+                        </div>
+
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nhân viên</th>
+                                    <th>Lương gộp</th>
+                                    <th>BHXH (NLĐ)</th>
+                                    <th>Điều chỉnh</th>
+                                    <th>Thực nhận</th>
+                                    <th>Ghi chú</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template x-for="emp in selectedPayrollMonth?.result?.employees" :key="emp.employeeId">
+                                    <tr>
+                                        <td>
+                                            <strong x-text="emp.employeeName"></strong><br>
+                                            <small x-text="emp.employeeCode + ' - ' + emp.position"></small>
+                                        </td>
+                                        <td x-text="formatMoney(emp.salaryDetail.grossSalary)"></td>
+                                        <td x-text="formatMoney(emp.bhxh.employeeContribution)"></td>
+                                        <td x-text="formatMoney(emp.adjustments)"></td>
+                                        <td><strong x-text="formatMoney(emp.netSalary)"></strong></td>
+                                        <td x-text="emp.note"></td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 

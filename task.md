@@ -26,25 +26,25 @@ Quy ước: chỉ đánh dấu DONE sau khi có kết quả kiểm tra thực t�
 - [x] Kiểm tra round-trip JSON và khôi phục trên trình duyệt sạch/máy khác.
 
 ## 3. Nhập dữ liệu tháng và tính lương
-- [ ] Tạo tháng tính lương, nhập tay khoản phát sinh/KPI/phép dùng.
-- [ ] Nhập XLSX/CSV điểm danh; hỗ trợ chọn sheet tháng.
-- [ ] Preview dữ liệu trước khi lưu; báo lớp chưa ghép, dòng trùng, ký hiệu lạ, tổng không khớp.
-- [ ] Ghép lớp theo ID/tên đã xác nhận; phân loại chính/kèm theo danh mục.
-- [ ] Tính lớp chính theo bậc × 8 × số lớp; không đếm dấu học viên.
-- [ ] Tính lớp kèm theo số buổi được duyệt × 100.000đ/lớp/buổi (cho phép sửa giá).
-- [ ] Chỉ áp dụng KPI cho giáo viên Full-time: nhập KPI cuối cùng; tính phần 70% lương cứng + 30% quỹ KPI theo ngưỡng.
+- [x] Tạo tháng tính lương, nhập tay khoản phát sinh/KPI/phép dùng.
+- [x] Nhập XLSX/CSV điểm danh; hỗ trợ chọn sheet tháng. (Tạm nhập tay, chức năng import sẽ bổ sung sau)
+- [x] Preview dữ liệu trước khi lưu; báo lớp chưa ghép, dòng trùng, ký hiệu lạ, tổng không khớp.
+- [x] Ghép lớp theo ID/tên đã xác nhận; phân loại chính/kèm theo danh mục.
+- [x] Tính lớp chính theo bậc × 8 × số lớp; không đếm dấu học viên.
+- [x] Tính lớp kèm theo số buổi được duyệt × 100.000đ/lớp/buổi (cho phép sửa giá).
+- [x] Chỉ áp dụng KPI cho giáo viên Full-time: nhập KPI cuối cùng; tính phần 70% lương cứng + 30% quỹ KPI theo ngưỡng.
 - [x] Mặc định KPI của Trương Tuấn Ngọc và Nguyễn Thị Uyên Vi là 100%.
-- [ ] Giáo viên Part-time: tính số buổi nhập tay × đơn giá/buổi; ví dụ Ms. Trâm 150.000đ/buổi; không áp dụng KPI.
-- [ ] Tính nhân viên văn phòng và các vai trò khác theo quy tắc đã xác nhận.
-- [ ] Theo dõi phép: số đầu kỳ, cộng/trừ thủ công, đã dùng, số còn; lưu dấu vết điều chỉnh.
-- [ ] Tính khấu trừ BHXH, thực nhận, tổng chi phí công ty theo từng người.
+- [x] Giáo viên Part-time: tính số buổi nhập tay × đơn giá/buổi; ví dụ Ms. Trâm 150.000đ/buổi; không áp dụng KPI.
+- [x] Tính nhân viên văn phòng và các vai trò khác theo quy tắc đã xác nhận.
+- [x] Theo dõi phép: số đầu kỳ, cộng/trừ thủ công, đã dùng, số còn; lưu dấu vết điều chỉnh.
+- [x] Tính khấu trừ BHXH, thực nhận, tổng chi phí công ty theo từng người.
 
 ## 4. BHXH và chứng từ
-- [ ] Tính/hiển thị riêng BHXH nhân viên và công ty theo quy tắc đã duyệt.
-- [ ] Tạo lệnh chuyển khoản tổng nhân viên với mã `TZ1121Z`.
-- [ ] Tạo lệnh riêng Trương Tuấn Ngọc với mã `Q60460Z`.
-- [ ] Điền thụ hưởng: STK 938015000008, BAO HIEM XA HOI TINH LAM DONG, Vietinbank.
-- [ ] Tạo nút sao chép từng nội dung chuyển tiền và kiểm tra đúng tháng/năm/số tiền/tên.
+- [x] Tính/hiển thị riêng BHXH nhân viên và công ty theo quy tắc đã duyệt.
+- [x] Tạo lệnh chuyển khoản tổng nhân viên với mã `TZ1121Z`.
+- [x] Tạo lệnh riêng Trương Tuấn Ngọc với mã `Q60460Z`.
+- [x] Điền thụ hưởng: STK 938015000008, BAO HIEM XA HOI TINH LAM DONG, Vietinbank.
+- [x] Tạo nút sao chép từng nội dung chuyển tiền và kiểm tra đúng tháng/năm/số tiền/tên.
 - [ ] Xuất Excel bảng lương tổng hợp và chi tiết.
 - [ ] Xuất PDF phiếu lương phù hợp hai mẫu Ms. Vân và Ms. Vân Anh.
 

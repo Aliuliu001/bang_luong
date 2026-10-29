@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tính Lương & Phép - Joy English Center</title>
     <link rel="stylesheet" href="styles.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="payroll-engine.js"></script>
+    <script src="payroll-engine.js?v=1.1.0"></script>
 </head>
 <body x-data="app()" x-init="init()">
     <div class="container">
@@ -102,7 +102,7 @@
                                 <th>Vị trí</th>
                                 <th>Loại</th>
                                 <th>Bậc</th>
-                                <th>Lương cố định</th>
+                                <th>Cách tính lương</th>
                                 <th>Trạng thái</th>
                                 <th>Thao tác</th>
                             </tr>
@@ -115,7 +115,7 @@
                                     <td x-text="emp.position"></td>
                                     <td x-text="emp.type"></td>
                                     <td x-text="emp.level || '-'"></td>
-                                    <td x-text="formatMoney(emp.fixedSalary)"></td>
+                                    <td x-text="getSalaryLabel(emp)"></td>
                                     <td>
                                         <span :class="'status-' + emp.status" x-text="getStatusText(emp.status)"></span>
                                     </td>
@@ -512,6 +512,6 @@
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <script src="app.js?v=1.1.0"></script>
 </body>
 </html>

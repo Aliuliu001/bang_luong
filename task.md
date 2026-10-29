@@ -1,66 +1,58 @@
-# TASKS — Ứng dụng Tính lương & Phép Trung tâm Joy
+# TASKS — Bảng lương & Phép Joy
 
-Quy ước: chỉ đánh dấu DONE sau khi có kết quả kiểm tra thực tế. Chưa bắt đầu code; mọi mục bên dưới đang chờ duyệt kế hoạch và xác nhận nghiệp vụ.
+**Quy ước:** chỉ tick `[x]` khi đã có test/kiểm tra giao diện thực tế. Mỗi đợt tối đa **2 task**; xong đợt phải cập nhật `plan.md`, `context.md`, chạy test và backup trước khi chuyển đợt.
 
-## 0. Chuẩn bị & rà soát dữ liệu
-- [x] Đối chiếu danh mục 10 nhân viên: 8 người đang làm (Khôi + Quỳnh không BHXH; Tuyết Quỳnh tạm nghỉ); Ms. Hồng Anh từ tháng 11 nghỉ việc nhưng vẫn BHXH tự nguyện.
-- [x] Xác nhận: Tuyết Quỳnh tạm nghỉ; Content Mr. Khôi 1.6M/tháng; lớp kèm 100k/lớp/buổi.
-- [x] Đọc BHXH.xlsx: 8 người; Trương Tuấn Ngọc 1.504.500đ (chỉnh sửa được), khấu trừ NLĐ 535.500đ, chênh 969k ghi chú.
-- [x] Đối chiếu 8 người BHXH: Khôi + Quỳnh không tham gia; Ms. Hồng Anh tháng 10 bình thường, từ tháng 11 chỉ BHXH tự nguyện.
-- [x] Chốt cách tổng hợp chấm công: tạm nhập tay; app hỗ trợ nhập CSV/JSON từ repo `cham_cong_in-out_joy` (không sửa repo chấm công).
-- [x] Chốt KPI 70/30; Full-time; mặc định anh Trương + Uyên Vi = 100%, cho phép chỉnh từng tháng.
-- [x] Chốt mẫu Excel/PDF từ 2 file mẫu tháng 09.2026.
+## Đợt 0 — Tài liệu và an toàn dữ liệu
+- [x] Tổng hợp lỗi/đề xuất lương, KPI, phép, lớp và chấm công vào `plan.md`/`context.md`/`README.md`.
+- [x] Sửa README có conflict marker trên GitHub và kiểm lại sau push.
+- [x] Kiểm tra syntax JS, quét conflict marker thật và `git diff --check`.
+- [x] Tạo test Node độc lập: KPI, part-time, gói tháng, BHXH, mốc Chỉ BHXH và migration dữ liệu cũ.
+- [x] Chốt chuẩn đang chờ `attendance-export-v4`: 3 sheet và Mã dòng; không nhận V3/12 cột cũ để tính tiền thật.
 
-## 1. Tạo repo và nền ứng dụng
-- [x] Tạo repo `Aliuliu001/bang_luong` dạng public; đã xác minh trên GitHub.
-- [x] Không đưa dữ liệu lương/BHXH cá nhân, workbook nguồn hay backup JSON vào repo public; dữ liệu thật chỉ nhập trong app và backup riêng.
-- [x] Khởi tạo ứng dụng tĩnh cho GitHub Pages; thiết kế giao diện đơn giản, tiếng Việt.
-- [x] Tạo cấu trúc dữ liệu có version cho nhân viên, lớp, tháng lương, phép, BHXH, nhắc việc.
-- [x] Thêm cảnh báo không đưa dữ liệu nhạy cảm vào repo công khai.
+## Đợt 1 — Danh mục nhân sự và cách hiển thị tiền lương
+- [x] Tách nền dữ liệu/hiển thị: tính theo bậc & lớp, đơn giá/buổi, gói lương/tháng; còn extra có lý do là việc sau.
+- [ ] Khôi: gói 1.600.000đ/tháng, extra sửa được có ghi chú, BHXH = không. *(Đã xong gói tháng + không BHXH; còn form extra.)*
+- [x] Vân Anh: gói tháng 9.200.000đ; part-time Trâm/Nhung hiển thị đơn giá/buổi, không nằm dưới cột “lương cố định”.
+- [ ] Form chỉnh sửa nhân viên đầy đủ, không còn popup chỉ sửa tên.
+- [x] Hồng Anh: chuyển Chỉ BHXH theo kỳ từ `2026-11`, không làm các kỳ trước thành Chỉ BHXH.
 
-## 2. Danh mục và sao lưu
-- [x] Nhập danh sách nhân viên/lớp đã được anh xác nhận.
-- [x] Tạo màn hình chỉnh sửa danh mục, mức lương, bậc, loại lớp, đơn giá kèm, mức BHXH.
-- [x] Tải backup JSON đầy đủ.
-- [x] Nhập/khôi phục JSON có xem trước, kiểm tra định dạng/phiên bản và sao lưu trước khi thay thế dữ liệu.
-- [x] Kiểm tra round-trip JSON và khôi phục trên trình duyệt sạch/máy khác.
+## Đợt 2 — Lớp và giáo viên phụ trách
+- [ ] Nạp đủ 29 lớp nguồn; giữ ba lớp Kèm và không tạo trùng khi app đã có dữ liệu cũ.
+- [ ] Mỗi lớp có dropdown Giáo viên phụ trách, cho chọn “Chưa phân công”, tự lưu sau đổi.
+- [ ] Thêm trạng thái lớp Hoạt động/Ngưng hoạt động; lớp ngưng tô đỏ, không bị xóa/ẩn.
+- [ ] Kiểm backup/restore vẫn giữ giáo viên, trạng thái, đơn giá lớp.
 
-## 3. Nhập dữ liệu tháng và tính lương
-- [x] Tạo tháng tính lương, nhập tay khoản phát sinh/KPI/phép dùng.
-- [x] Nhập XLSX/CSV điểm danh; hỗ trợ chọn sheet tháng. (Tạm nhập tay, chức năng import sẽ bổ sung sau)
-- [x] Preview dữ liệu trước khi lưu; báo lớp chưa ghép, dòng trùng, ký hiệu lạ, tổng không khớp.
-- [x] Ghép lớp theo ID/tên đã xác nhận; phân loại chính/kèm theo danh mục.
-- [x] Tính lớp chính theo bậc × 8 × số lớp; không đếm dấu học viên.
-- [x] Tính lớp kèm theo số buổi được duyệt × 100.000đ/lớp/buổi (cho phép sửa giá).
-- [x] Chỉ áp dụng KPI cho giáo viên Full-time: nhập KPI cuối cùng; tính phần 70% lương cứng + 30% quỹ KPI theo ngưỡng.
-- [x] Mặc định KPI của Trương Tuấn Ngọc và Nguyễn Thị Uyên Vi là 100%.
-- [x] Giáo viên Part-time: tính số buổi nhập tay × đơn giá/buổi; ví dụ Ms. Trâm 150.000đ/buổi; không áp dụng KPI.
-- [x] Tính nhân viên văn phòng và các vai trò khác theo quy tắc đã xác nhận.
-- [x] Theo dõi phép: số đầu kỳ, cộng/trừ thủ công, đã dùng, số còn; lưu dấu vết điều chỉnh.
-- [x] Tính khấu trừ BHXH, thực nhận, tổng chi phí công ty theo từng người.
+## Đợt 3 — Công thức KPI
+- [x] Sửa KPI: ≥85=100%, 70–84=75%, 50–69=50%, <50=0% quỹ KPI.
+- [x] Test ranh giới 49/50/69/70/84/85 và xác nhận 70% lương cứng không đổi.
+- [ ] Cập nhật nhãn/hướng dẫn KPI trên màn hình nhập lương.
 
-## 4. BHXH và chứng từ
-- [x] Tính/hiển thị riêng BHXH nhân viên và công ty theo quy tắc đã duyệt.
-- [x] Tạo lệnh chuyển khoản tổng nhân viên với mã `TZ1121Z`.
-- [x] Tạo lệnh riêng Trương Tuấn Ngọc với mã `Q60460Z`.
-- [x] Điền thụ hưởng: STK 938015000008, BAO HIEM XA HOI TINH LAM DONG, Vietinbank.
-- [x] Tạo nút sao chép từng nội dung chuyển tiền và kiểm tra đúng tháng/năm/số tiền/tên.
-- [ ] Xuất Excel bảng lương tổng hợp và chi tiết.
-- [ ] Xuất PDF phiếu lương phù hợp hai mẫu Ms. Vân và Ms. Vân Anh.
+## Đợt 4 — Phép cộng dần và lịch sử phép
+- [ ] Thay số phép mặc định 12 ngày bằng số dư 0 + số dư đầu kỳ do anh nhập.
+- [ ] Nhóm A (Văn phòng/kiêm nhiệm): +1/tháng đủ, +0,5/quý đủ, trần 14/năm.
+- [ ] Nhóm B (GV WFH): +0,5/tháng đủ, +0,25/quý đủ, trần 7/năm.
+- [ ] Nhập ngày nghỉ/ngày làm theo lịch; chỉ từ nghỉ nửa tháng mới coi tháng không đủ.
+- [ ] Nhật ký: cộng tháng, thưởng quý, điều chỉnh, đã dùng; chống cộng trùng.
+- [ ] Test: Nhóm A đủ quý=3,5; Nhóm B đủ quý=1,75; thiếu nửa tháng không cộng/thưởng; trần năm; sửa tay số dư.
 
-## 5. Nhắc việc, lịch sử và hoàn tất
-- [ ] Hiện checklist nhắc cuối tháng khi mở app; hỗ trợ đánh dấu xong và sao chép nội dung.
-- [ ] Lưu lịch sử tháng đã tính/chốt, cho mở lại và tải chứng từ.
-- [ ] Kiểm thử công thức, nhập file, xuất báo cáo, backup/restore; so khớp tháng thử với bảng tay.
-- [ ] Chạy validator đầy đủ: cú pháp, kiểm thử tự động, smoke test giao diện và nhập/xuất.
-- [ ] Audit độc lập: công thức lương/BHXH/KPI, xử lý dữ liệu, không lộ dữ liệu cá nhân, không ghi đè/xóa dữ liệu âm thầm.
-- [ ] Khắc phục lỗi audit; lưu kết quả test và quyết định các rủi ro còn lại.
-- [ ] Anh duyệt kết quả tháng thử.
-- [ ] Triển khai GitHub Pages; kiểm tra URL hoạt động, tải trang, tạo backup/restore thành công.
+## Đợt 5 — Nhập chấm công V4 và duyệt ca
+- [ ] Chờ/kiểm file `Cham_cong_tinh_luong_MM-YYYY.xlsx`, phiên bản `attendance-export-v4`, đủ 3 sheet `Tong hop GV` / `Chi tiet ca` / `Gio tuan`.
+- [ ] Nút nhập file, xem trước và báo thiếu sheet/cột/Mã dòng/trùng; không làm mất dữ liệu đang có.
+- [ ] Dùng Mã dòng để truy vết/chống trùng; chỉ ưu tiên Bản chốt, cảnh báo vàng Dữ liệu hiện tại hoặc Lịch hiện tại.
+- [ ] Không tính công: hiện quota + Chờ quản lý kiểm tra, không tự cộng giờ/lương.
+- [ ] Exception: giữ giờ kiểm 40/46, nhưng giờ đề xuất = 0 cho tới khi anh chọn Đã duyệt/Không duyệt.
+- [ ] PH xin nghỉ không trừ phép/KPI; ảnh hưởng KPI chỉ hiển thị để anh quyết định, không tự đổi % KPI.
+- [ ] Không tạo overtime từ Gio tuan; kiểm đầy đủ các ca thường, thiếu IN/OUT, Exception và nguồn/lịch cảnh báo.
 
-## Trạng thái hiện tại
-- [x] Đọc cấu trúc file Mr. Ngọc.xlsx và workbook nhân viên/lớp.
-- [x] Ghi nhận hai mẫu phiếu lương và các quy tắc KPI đã xác nhận.
-- [x] Lập plan.md và task.md.
-- [ ] Chưa tạo repo, chưa viết ứng dụng, chưa nhập dữ liệu thật vào app.
-- [ ] Cần anh duyệt plan và giải quyết các câu hỏi chặn trong `plan.md` trước khi triển khai phần tính lương.
+## Đợt 6 — Chốt kỳ và phiếu lương
+- [ ] Màn hình xem trước theo từng người, khóa/snapshot số liệu khi chốt kỳ.
+- [ ] Xuất Excel tổng hợp + chi tiết, tổng phải khớp bảng tính.
+- [ ] Xuất PDF từng người dùng nền `TEACHER SALARY SLIP`; giữ logo/nền, có lương cứng, KPI, lớp kèm, extra, BHXH, thực nhận.
+- [ ] Đối chiếu phiếu Mr. Đức Anh 09/2026 và mẫu văn phòng trước khi phát hành.
+- [ ] Test export, backup/restore, giao diện và dữ liệu tháng thử; anh duyệt trước khi dùng tiền thật.
+
+## Các việc đã có từ phiên bản trước
+- [x] Khung app HTML/JS, danh mục, kỳ lương, BHXH, backup/restore.
+- [x] Công thức Full-time/Part-time cơ bản; chưa đạt quy tắc mới nên không dùng để chốt tiền thật.
+- [x] Nội dung chuyển khoản BHXH cơ bản.
+- [ ] Xuất Excel/PDF và tích hợp chấm công chưa hoàn thành.

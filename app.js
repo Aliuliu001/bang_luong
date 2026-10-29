@@ -21,7 +21,7 @@ function app() {
             defaultKemPrice: 100000,
             bhxhEmployeeRate: 10.5, // %
             bhxhCompanyRate: 21.5, // %
-            version: '1.0.0'
+            version: '1.1.0'
         },
         
         // Monthly tasks reminder
@@ -41,7 +41,9 @@ function app() {
         init() {
             this.loadFromLocalStorage();
             this.initSampleData();
+            this.migrateData();
             this.calculateBHXH();
+            this.saveToLocalStorage();
         },
         
         // Initialize sample data (only if empty)
@@ -95,10 +97,11 @@ function app() {
                         type: 'Full-time',
                         level: 5,
                         fixedSalary: 0,
-                        status: 'bhxh-only', // Từ tháng 11
+                        status: 'active',
+                        bhxhOnlyFrom: '2026-11',
                         bhxh: true,
                         bhxhBase: 5100000,
-                        bhxhVoluntary: true, // BHXH tự nguyện
+                        bhxhVoluntary: true, // Chỉ BHXH từ tháng 11/2026 theo kỳ lương
                         kpiDefault: 85
                     },
                     {
@@ -121,7 +124,8 @@ function app() {
                         position: 'GV',
                         type: 'Part-time',
                         level: 3,
-                        fixedSalary: 150000, // Per session
+                        ratePerSession: 150000,
+                        fixedSalary: 150000, // Giữ để tương thích dữ liệu cũ
                         status: 'active',
                         bhxh: false
                     },
@@ -132,7 +136,8 @@ function app() {
                         position: 'GV',
                         type: 'Part-time',
                         level: 2,
-                        fixedSalary: 120000, // Per session
+                        ratePerSession: 120000,
+                        fixedSalary: 120000, // Giữ để tương thích dữ liệu cũ
                         status: 'active',
                         bhxh: false
                     },
@@ -143,7 +148,8 @@ function app() {
                         position: 'HCNS',
                         type: 'Full-time',
                         level: 0,
-                        fixedSalary: 9200000, // Fixed monthly
+                        monthlyPackage: 9200000,
+                        fixedSalary: 9200000, // Giữ để tương thích dữ liệu cũ
                         status: 'active',
                         bhxh: true,
                         bhxhBase: 5100000
@@ -153,9 +159,10 @@ function app() {
                         code: 'NV0801',
                         name: 'Trần Đặng Chí Khôi',
                         position: 'Content',
-                        type: 'Part-time',
+                        type: 'Monthly-package',
                         level: 0,
-                        fixedSalary: 1600000, // Per month
+                        monthlyPackage: 1600000,
+                        fixedSalary: 1600000, // Giữ để tương thích dữ liệu cũ
                         status: 'active',
                         bhxh: false
                     }
@@ -244,12 +251,32 @@ function app() {
             return '';
         },
         
+        migrateData() {
+            this.employees = this.employees.map(emp => {
+                const migrated = { ...emp };
+                if (migrated.position === 'GV' && migrated.type === 'Part-time' && migrated.ratePerSession == null) {
+                    migrated.ratePerSession = Number(migrated.fixedSalary || 0);
+                }
+                if ((migrated.position === 'HCNS' || migrated.position === 'Content') && migrated.monthlyPackage == null) {
+                    migrated.monthlyPackage = Number(migrated.fixedSalary || 0);
+                }
+                if (migrated.id === 4 && migrated.status === 'bhxh-only' && !migrated.bhxhOnlyFrom) {
+                    migrated.status = 'active';
+                    migrated.bhxhOnlyFrom = '2026-11';
+                }
+                return migrated;
+            });
+        },
+
+        getSalaryLabel(emp) {
+            if (emp.position === 'GV' && emp.type === 'Full-time') return 'Tính theo bậc & lớp';
+            if (emp.position === 'GV' && emp.type === 'Part-time') return `Đơn giá/buổi: ${this.formatMoney(emp.ratePerSession || emp.fixedSalary)}`;
+            return `Gói lương/tháng: ${this.formatMoney(emp.monthlyPackage || emp.fixedSalary)}`;
+        },
+
         // Calculate KPI percentage
         getKPIMultiplier(kpiScore) {
-            if (kpiScore >= 85) return 1.0;
-            if (kpiScore >= 70) return 0.75;
-            if (kpiScore >= 55) return 0.5;
-            return 0.25;
+            return PayrollEngine.getKPIMultiplier(kpiScore);
         },
         
         // Calculate Full-time teacher salary
@@ -435,8 +462,8 @@ function app() {
             this.employees.forEach(emp => {
                 const input = this.selectedPayrollMonth.payrollData[emp.id] || {};
                 
-                // For Part-time, regularClasses actually means sessions
-                if (emp.type === 'Part-time') {
+                // Only part-time teachers use approved sessions.
+                if (emp.position === 'GV' && emp.type === 'Part-time') {
                     input.sessions = input.regularClasses || 0;
                 }
                 
@@ -456,7 +483,8 @@ function app() {
             const result = PayrollEngine.generateMonthPayroll(
                 this.employees,
                 payrollData,
-                this.settings
+                this.settings,
+                this.selectedPayrollMonth.id
             );
             
             this.selectedPayrollMonth.result = result;

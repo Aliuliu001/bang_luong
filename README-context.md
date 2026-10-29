@@ -1,6 +1,8 @@
-# Tính lương & phép — ghi chú để tiếp tục ở chat mới
+# LƯU TRỮ — ghi chú khởi tạo dự án
 
-Đọc lần lượt: `plan.md`, `task.md`, rồi file này. Repo: https://github.com/Aliuliu001/bang_luong (public). Tạo xong và đã xác minh; chưa code/push. Public/private không ảnh hưởng commit/push khi PAT có quyền. Public giúp Pages chia sẻ dễ; tuyệt đối không commit dữ liệu lương/BHXH, workbook nguồn, backup JSON. Dữ liệu thật chỉ nằm trong trình duyệt và backup riêng. Private Pages có thể cần gói phù hợp/người xem đăng nhập.
+> **Không dùng file này làm nguồn quyết định hiện hành.** Nó chỉ lưu lịch sử lúc khởi tạo và còn quy tắc KPI cũ. Khi tiếp tục dự án, phải đọc theo thứ tự: `README.md` → `context.md` → `plan.md` → `task.md`.
+
+Đọc lần lượt: `README.md`, `context.md`, `plan.md`, `task.md`; chỉ mở file này khi cần đối chiếu lịch sử. Repo: https://github.com/Aliuliu001/bang_luong (public). Tạo xong và đã xác minh; chưa code/push. Public/private không ảnh hưởng commit/push khi PAT có quyền. Public giúp Pages chia sẻ dễ; tuyệt đối không commit dữ liệu lương/BHXH, workbook nguồn, backup JSON. Dữ liệu thật chỉ nằm trong trình duyệt và backup riêng. Private Pages có thể cần gói phù hợp/người xem đăng nhập.
 
 ## Trạng thái
 - Repo riêng đã tạo ở GitHub; chưa clone/đẩy code hoặc bật Pages.

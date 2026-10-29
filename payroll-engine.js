@@ -1,11 +1,29 @@
 // Payroll calculation engine
 const PayrollEngine = {
+    // Convert legacy saved data without changing its original fields.
+    normalizeEmployee(employee) {
+        const normalized = { ...employee };
+        if (normalized.position === 'GV' && normalized.type === 'Part-time' && normalized.ratePerSession == null) {
+            normalized.ratePerSession = Number(normalized.fixedSalary || 0);
+        }
+        if ((normalized.position === 'HCNS' || normalized.position === 'Content') && normalized.monthlyPackage == null) {
+            normalized.monthlyPackage = Number(normalized.fixedSalary || 0);
+        }
+        return normalized;
+    },
+
+    isBhxhOnlyForMonth(employee, payrollMonth) {
+        return employee.status === 'bhxh-only' || Boolean(employee.bhxhOnlyFrom && payrollMonth && payrollMonth >= employee.bhxhOnlyFrom);
+    },
+
     // Calculate Part-time salary
     calculatePartTimeSalary(employee, sessions) {
+        const ratePerSession = Number(employee.ratePerSession || employee.fixedSalary || 0);
         return {
             sessions: sessions,
-            ratePerSession: employee.fixedSalary,
-            total: sessions * employee.fixedSalary,
+            ratePerSession: ratePerSession,
+            total: sessions * ratePerSession,
+            grossSalary: sessions * ratePerSession,
             type: 'part-time'
         };
     },
@@ -57,30 +75,32 @@ const PayrollEngine = {
         };
     },
     
-    // Calculate office staff salary (fixed monthly)
+    // Calculate office staff salary (monthly package)
     calculateOfficeSalary(employee) {
+        const monthlyPackage = Number(employee.monthlyPackage || employee.fixedSalary || 0);
         return {
             type: 'office',
-            fixedSalary: employee.fixedSalary,
-            grossSalary: employee.fixedSalary
+            monthlyPackage: monthlyPackage,
+            grossSalary: monthlyPackage
         };
     },
     
-    // Calculate Content staff salary (fixed monthly)
+    // Calculate Content staff salary (monthly package)
     calculateContentSalary(employee) {
+        const monthlyPackage = Number(employee.monthlyPackage || employee.fixedSalary || 0);
         return {
             type: 'content',
-            fixedSalary: employee.fixedSalary,
-            grossSalary: employee.fixedSalary
+            monthlyPackage: monthlyPackage,
+            grossSalary: monthlyPackage
         };
     },
     
-    // Get KPI multiplier based on score
+    // Get KPI multiplier based on the approved salary rule.
     getKPIMultiplier(score) {
-        if (score >= 85) return 1.0;   // 100% of KPI fund
-        if (score >= 70) return 0.75;  // 75%
-        if (score >= 55) return 0.5;   // 50%
-        return 0.25;                   // 25%
+        if (score >= 85) return 1.0;
+        if (score >= 70) return 0.75;
+        if (score >= 50) return 0.5;
+        return 0;
     },
     
     // Calculate BHXH deduction
@@ -121,7 +141,8 @@ const PayrollEngine = {
     },
     
     // Generate payroll for one employee
-    generateEmployeePayroll(employee, monthData, settings) {
+    generateEmployeePayroll(rawEmployee, monthData, settings, payrollMonth = '') {
+        const employee = this.normalizeEmployee(rawEmployee);
         let salaryDetail = null;
         const isDirector = employee.id === 1; // Trương Tuấn Ngọc
         
@@ -130,8 +151,8 @@ const PayrollEngine = {
             return null;
         }
         
-        // Skip salary calculation for bhxh-only status
-        if (employee.status === 'bhxh-only') {
+        // BHXH-only applies only from the configured payroll month.
+        if (this.isBhxhOnlyForMonth(employee, payrollMonth)) {
             const bhxh = this.calculateBHXH(employee, settings, isDirector);
             return {
                 employeeId: employee.id,
@@ -194,7 +215,7 @@ const PayrollEngine = {
     },
     
     // Generate full payroll for a month
-    generateMonthPayroll(employees, payrollData, settings) {
+    generateMonthPayroll(employees, payrollData, settings, payrollMonth = '') {
         const results = [];
         let totalGross = 0;
         let totalBHXHEmployee = 0;
@@ -203,7 +224,7 @@ const PayrollEngine = {
         
         employees.forEach(employee => {
             const monthData = payrollData[employee.id] || {};
-            const payroll = this.generateEmployeePayroll(employee, monthData, settings);
+            const payroll = this.generateEmployeePayroll(employee, monthData, settings, payrollMonth);
             
             if (payroll) {
                 results.push(payroll);

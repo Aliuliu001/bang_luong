@@ -1,45 +1,105 @@
-# CONTEXT — Dự án tính lương & phép `bang_luong`
+# CONTEXT — Dự án Bảng lương & Phép Joy
 
-**Bắt đầu chat mới:** anh nhắn “Đọc `/home/ubuntu/bang_luong/README.md` và `/home/ubuntu/bang_luong/context.md`, rồi tiếp tục dự án bang_luong.” Đọc thêm `plan.md` và `task.md` để biết toàn bộ đặc tả/trạng thái.
+**Bắt đầu chat mới:** đọc `README.md`, `context.md`, `plan.md`, `task.md` trong `/home/ubuntu/bang_luong` trước khi sửa bất kỳ code nào.
 
-## Trạng thái hiện tại
-- Repo GitHub: https://github.com/Aliuliu001/bang_luong — **public**, đã tạo và xác minh. Chưa code, chưa push source, chưa bật GitHub Pages.
-- Thư mục dự án local: `/home/ubuntu/bang_luong` (đã đồng bộ tên với repo).
-- Tài liệu dự án: `README.md` (cách tiếp tục), `context.md` (yêu cầu và quyết định), `plan.md` (kế hoạch đầy đủ), `task.md` (tracker).
-- Chỉ code public; tuyệt đối không commit dữ liệu lương, BHXH, file XLSX/PDF nguồn, backup JSON thật hoặc PAT.
+## Trạng thái kỹ thuật xác minh gần nhất
 
-## Quyết định đã chốt
-- App web tĩnh trên GitHub Pages; dữ liệu lưu cục bộ trình duyệt; backup/restore JSON để chuyển máy; không đồng bộ tự động.
-- Nhắc việc cuối tháng hiển thị khi mở app, checklist tuần tự và nút sao chép; không cần Telegram tự gửi.
-- Xuất Excel/PDF theo mẫu GV và văn phòng Ms. Vân Anh.
-- Full-time giáo viên: tổng lớp chính = bậc × 8 × số lớp; lương cứng 70%, quỹ KPI 30%. KPI nhập cuối cùng: ≥85%=100% quỹ; 70–84%=75%; 55–69%=50%; 0–54%=25%.
-- KPI chỉ áp dụng Full-time. Trương Tuấn Ngọc và Nguyễn Thị Uyên Vi đặt KPI mặc định 100%; nên cho phép chỉnh từng tháng nếu cần.
-- Part-time: lương = số buổi dạy × đơn giá/buổi; số buổi hiện nhập tay trong lúc chưa thống nhất cách tự tổng hợp chấm công. Ví dụ Ms. Trâm 150.000đ/buổi. Không KPI.
-- Lớp kèm: danh mục có 3 lớp đánh dấu Kèm: `Kem-Đức`, `Kem-Nguyen & Tuan Anh`, `Kem-Khoi` (Mr. Đức Anh); đơn giá hiện 100.000đ/lớp/buổi, cho phép sửa. Số buổi sẽ nhập tay cho tới khi chốt cách chấm công.
-- Ms. Vân Anh: HCNS, lương 9.200.000đ/tháng; BHXH đóng trên 5.100.000đ; khấu trừ NLĐ 535.500đ.
-- BHXH.xlsx có 8 người tham gia (đã xác nhận; 2 người còn lại chưa tham gia). Tổng nhân viên thường 12.992.000đ (7 người, gồm Uyên Vi 3.200.000đ và sáu người 1.632.000đ/người). Tách lệnh Trương Tuấn Ngọc 1.504.500đ.
-- BHXH người lao động khấu trừ 10,5% cho cả mọi nhân viên tham gia và anh Trương; 5.100.000×10,5%=535.500đ; Uyên Vi 10.000.000×10,5%=1.050.000đ. Với anh Trương lương chỉ khấu trừ 535.500đ nhưng lệnh BHXH vẫn 1.504.500đ; ghi chú chênh 969.000đ để anh cân đối về sau, không tự gán bên chịu. Số lệnh 1.504.500đ phải chỉnh được.
-- Thụ hưởng BHXH: STK `938015000008`; `BAO HIEM XA HOI TINH LAM DONG`; Vietinbank. Hai lệnh/nội dung riêng theo mã `TZ1121Z` (nhân viên) và `Q60460Z` (Truong Tuan Ngoc), thay tháng/năm tương ứng.
-- Phép: giai đoạn đầu nhập tay điều chỉnh và phép đã dùng, theo dõi số dư; chưa tự động cộng phép.
+- Repo: `https://github.com/Aliuliu001/bang_luong`, nhánh `main`, GitHub Pages đã từng bật.
+- App là HTML/CSS/JavaScript tĩnh, Alpine.js, dữ liệu nằm trong `localStorage` và backup JSON.
+- Core: `app.js`, `payroll-engine.js`, `index.html`, `styles.css`.
+- Tại thời điểm lập context: app chưa đủ điều kiện dùng lương thật; còn các lỗi nghiệp vụ/UI trong `plan.md`.
+- `README.md` từng có conflict marker Git; đã thay bằng tài liệu sạch. Luôn chạy kiểm tra conflict trước commit.
+- Không commit dữ liệu nhân sự/lương/BHXH thật, workbook, phiếu PDF, backup JSON hoặc token.
 
-## Dữ liệu nguồn đã kiểm tra (không nằm trong repo)
-- `Mr. Ngọc.xlsx`: dùng sheet `10.2026` làm mẫu chấm công gần nhất.
-- `Danh sách nhân viên và danh sách lớp tương ứng.xlsx`: 10 người và 29 dòng lớp; 3 lớp Kèm ở trên. Nhân viên: NV0101 Trương Tuấn Ngọc GV FT bậc 5; NV2301 Nguyễn Thị Uyên Vi GV FT bậc 5; NV2707 Lê Đức Anh GV FT bậc 5; NV1308 Nguyễn Hồng Anh GV FT bậc 5; NV0904 Phạm Hoàng Khánh Vân GV FT bậc 6; NV2412 Nguyễn Ngọc Bảo Trâm GV PT bậc 3, 150k/buổi; NV2503 Trần Bảo Hạnh Nhung GV PT bậc 2, 120k/buổi; NV0204 Huỳnh Thuỵ Vân Anh HCNS FT, 9.2M/tháng; NV0801 Trần Đặng Chí Khôi Content PT, bảng ghi 1.6M mức lương/lớp; Nguyễn Ngọc Tuyết Quỳnh trợ giảng PT bậc 0, 80k/buổi, mã NV để trống. Các điều kiện/mức còn mơ hồ cần hỏi trước tính thật.
-- `BHXH.xlsx`: 8 dòng; file ghi header 10.5% NLĐ và 21.5% công ty, mỗi người có tổng tỷ lệ (32%, riêng Trương Tuấn Ngọc 29.5%); cột NLĐ/công ty trong tệp hiện là 0, do đó dùng đúng các xác nhận trong chat ở trên.
-- Hai PDF phiếu lương tháng 09.2026: GV có lương cứng/KPI/BHXH/thực nhận; văn phòng Vân Anh có lương/BHXH/thực nhận.
+## Quy tắc lương đã chốt
 
-## ✅ Đã xác nhận (2026-10-27)
-1. **Part-time/lớp kèm**: Tạm nhập tay số buổi. Anh có repo chấm công check in/out (`cham_cong_in-out_joy`); app lương sẽ hỗ trợ nhập CSV/JSON từ báo cáo chấm công để tự tính buổi đi làm. Không sửa code repo chấm công; chỉ xuất dữ liệu sang.
-2. **Lớp kèm**: Giá 100.000đ/lớp/buổi — xác nhận đúng.
-3. **Content & Trợ giảng**: Mr. Khôi (Content) 1.600.000đ/tháng. Ms. Tuyết Quỳnh (trợ giảng) đang tạm nghỉ → không tính trong roster hiện tại.
-4. **BHXH 8 người**: Khôi và Quỳnh không đóng BHXH. **Ms. Hồng Anh từ tháng 11 nghỉ việc** nhưng vẫn đóng BHXH tự nguyện (gửi 1.632.000đ vào trung tâm). **Tháng 10**: tính lương bình thường. **Tháng 11 trở đi**: ngưng lương Ms. Hồng Anh, chỉ nhận BHXH tự nguyện.
-5. **KPI mặc định**: Anh Trương và Uyên Vi 100% — xác nhận đúng; cho phép chỉnh theo tháng.
+### Full-time giáo viên
+- Lương lớp chính = `bậc × 8 buổi × số lớp`.
+- Tách 70% lương cứng và 30% quỹ KPI.
+- KPI chỉ áp dụng cho giáo viên full-time:
+  - ≥85%: 100% quỹ KPI.
+  - 70–84%: 75% quỹ KPI.
+  - 50–69%: 50% quỹ KPI.
+  - <50%: 0% quỹ KPI.
+- Mr. Ngọc và Ms. Uyên Vi mặc định KPI 100%, nhưng từng tháng vẫn sửa được.
+- Chấm IN/OUT không tự làm giảm số lớp/lương full-time; dùng để tham khảo quản lý ca, KPI, phép.
 
-## Việc cần làm tiếp theo
-- Gán giáo viên cụ thể cho 3 lớp Kèm (`Kem-Đức`, `Kem-Nguyen & Tuan Anh`, `Kem-Khoi`) — hiện đều thuộc Mr. Đức Anh.
-- Thiết kế màn hình nhập/xuất dữ liệu chấm công từ repo `cham_cong_in-out_joy`.
+### Part-time / gói tháng
+- Giáo viên part-time = `số buổi đã duyệt × đơn giá/buổi`; không có KPI 70/30.
+- Các số 150.000đ và 120.000đ của Trâm/Nhung là **đơn giá/buổi**, không phải “lương cố định”.
+- Mr. Khôi: Content, **không BHXH**, gói lương **1.600.000đ/tháng**, có khoản extra cộng/trừ theo từng tháng, sửa được kèm ghi chú.
+- Ms. Vân Anh: HCNS, gói lương 9.200.000đ/tháng.
+- Lớp kèm: đơn giá mặc định 100.000đ/lớp/buổi, phải sửa được theo lớp/buổi khi cần.
 
-## Quy trình an toàn
-- Trước khi tính tiền thật, hiển thị bảng xem trước/đối chiếu; không tự đoán ô trống.
-- Dữ liệu thật chỉ nhập trong app, backup riêng, không đưa lên GitHub. Repo public không cản push/commit; private repo cũng push được nếu PAT có quyền, nhưng có thể làm Pages khó chia sẻ hơn tùy cấu hình/gói.
-- Làm từng phần, validator + test + audit bắt buộc; không triển khai Pages cho tới khi anh kiểm tra bảng thử.
+### BHXH
+- Khôi và Quỳnh không đóng BHXH.
+- Ms. Hồng Anh: tháng 10 tính lương bình thường; từ tháng 11 nghỉ việc nhưng có BHXH tự nguyện 1.632.000đ.
+- BHXH NLĐ thông thường: 10,5%; công ty: 21,5%.
+- Anh Trương: khấu trừ NLĐ 535.500đ trên nền 5.100.000đ; lệnh BHXH riêng 1.504.500đ và có thể sửa.
+
+## Danh mục nhân sự/lớp
+
+- Có danh sách nguồn 10 nhân sự và **29 lớp**. App hiện mới khởi tạo 3 lớp Kèm — đây là lỗi thiếu dữ liệu cần sửa.
+- Ba lớp Kèm: `Kem-Đức`, `Kem-Nguyen & Tuan Anh`, `Kem-Khoi`.
+- Tất cả lớp anh đã gửi hiện đang hoạt động.
+- Bảng Lớp phải có dropdown `Giáo viên phụ trách`, đổi được khi chuyển lớp.
+- Lớp ngưng tương lai: không xóa/ẩn tự động, giữ lại và tô đỏ `Ngưng hoạt động` để anh kiểm.
+
+## Phép — quy tắc chính thức
+
+Phép được cộng dần theo thời gian làm đủ, không cấp sẵn đầu năm. Số đầu kỳ, phép đã dùng và điều chỉnh phải sửa được, có lý do/lịch sử.
+
+### Nhóm A: Văn phòng / kiêm nhiệm văn phòng + giáo viên
+Áp dụng Ms. Vân Anh, Mr. Ngọc, Ms. Uyên Vi.
+- Làm đủ một tháng: +1 ngày.
+- Đủ liên tục 3 tháng trong quý: cộng thêm +0,5 ngày.
+- Một quý đủ: 3,5 ngày.
+- Tối đa 14 ngày/năm nếu làm đủ 12 tháng.
+
+### Nhóm B: Giáo viên WFH
+- Làm đủ một tháng: +0,5 ngày.
+- Đủ liên tục 3 tháng trong quý: cộng thêm +0,25 ngày.
+- Một quý đủ: 1,75 ngày.
+- Tối đa 7 ngày/năm nếu làm đủ 12 tháng.
+
+### Điều kiện “làm đủ”
+- Chỉ khi tổng thời gian nghỉ **từ nửa tháng trở lên** mới coi là tháng không làm đủ.
+- Tháng không đủ: không cộng phần tháng và quý chứa tháng đó không nhận thưởng quý.
+- Trước khi tích hợp chấm công đầy đủ: nhập tay số ngày nghỉ và số ngày làm theo lịch để app so sánh; không tự suy diễn.
+- Mỗi lần cộng tự động cần khóa chống trùng theo `nhân viên + tháng/quý + loại cộng`.
+
+## Liên thông Check IN/OUT → Bảng lương
+
+Hai app tách riêng. Repo chấm công: `Aliuliu001/cham_cong_in-out_joy`.
+
+### Chuẩn file đang chờ từ Check IN/OUT: attendance-export-v4
+
+Chỉ nhận file `Cham_cong_tinh_luong_MM-YYYY.xlsx` khi `Phiên bản file = attendance-export-v4` và có đúng ba sheet: `Tong hop GV`, `Chi tiet ca`, `Gio tuan`.
+
+- `Chi tiet ca` là nguồn chính; mỗi dòng có **Mã dòng** do hệ thống tạo, giữ ổn định khi xuất lại. Bảng lương dùng Mã dòng để chống nhập trùng và lưu quyết định Exception.
+- `Tong hop GV` và `Gio tuan` chỉ để đối chiếu; không tự tạo tiền lương/overtime từ số tổng.
+- Ca thường đủ IN+OUT: dùng giờ thực tế `OUT − IN` để đối chiếu.
+- Thiếu một đầu: không tự tính công, kể cả bốn lần đầu năm; hiện ngày, ca, quota và `Chờ quản lý kiểm tra`. Từ lần thứ năm vẫn không tính công và phải đánh dấu ảnh hưởng KPI.
+- Phụ huynh xin nghỉ là lớp không học, không phải GV nghỉ phép: không trừ phép, không giảm KPI; báo muộn chỉ là nhắc nhở.
+- Exception đủ IN+OUT: cộng vào bảng kiểm 40/46 giờ, nhưng `Giờ đề xuất tính công = 0`, `Kết quả công = Chờ duyệt Exception`; không tự trả tiền/overtime.
+- Quyết định `Đã duyệt`/`Không duyệt` Exception chỉ lưu trong Bảng lương, không ghi ngược repo Chấm công.
+- Ưu tiên `Nguồn dữ liệu = Bản chốt`; `Dữ liệu hiện tại` phải cảnh báo vàng. `Lịch đối chiếu = Lịch hiện tại` cũng cảnh báo vàng vì lịch có thể đã đổi.
+
+**Không dùng file v3 hoặc định dạng 12 cột cũ để nhập thật.** V4 đang chờ repo Check IN/OUT hoàn thiện và phải có file mẫu để kiểm end-to-end.
+
+### Quy đổi ca → buổi part-time
+Việc quy đổi chỉ bắt đầu sau khi nhận V4 mẫu và anh duyệt từng ngoại lệ. App không được tự trả tiền từ `Tong hop GV`, `Gio tuan`, ca thiếu IN/OUT hoặc Exception chưa duyệt.
+
+## Phiếu lương PDF
+
+- Background nguồn: file PowerPoint `02.2025 - Copy.pptx`, có nền `TEACHER SALARY SLIP` và logo `LEARN ENGLISH WITH JOY`.
+- Giữ nguyên nền, chèn dữ liệu ở lớp phía trên, không che logo/trang trí.
+- Xuất mỗi nhân sự một PDF; thông tin bao gồm kỳ lương, các hạng mục, 70% lương cứng, KPI, lớp kèm, extra/điều chỉnh, BHXH và thực nhận.
+- File Mr. Đức Anh tháng 09/2026 là mẫu đối chiếu số liệu/bố cục; không đưa file này lên repo public.
+
+## Cách làm bắt buộc
+
+- Chưa code trước khi anh duyệt toàn bộ đợt trong `plan.md`.
+- Mỗi đợt tối đa 2 task để dễ kiểm thử và phản hồi.
+- Viết test đỏ trước mỗi thay đổi công thức/migration; sau đó test hồi quy, smoke test giao diện và kiểm backup/restore.
+- Khi có thay đổi ngoài repo: kiểm tra đọc lại trước khi báo hoàn thành.
